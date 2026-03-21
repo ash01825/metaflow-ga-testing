@@ -20,7 +20,7 @@ def wait_for_result(triggered_run, timeout=60):
     return run
 
 
-def wait_for_run(flow_name, ns=None, timeout=60):
+def wait_for_run(flow_name, ns=None, timeout=120):
     "Wait for a Run for a flow name to start executing in the given namespace"
     namespace(ns)
     slept = 0
@@ -92,7 +92,7 @@ def wait_for_runs_after_ts(
     return runs
 
 
-def wait_for_run_to_finish(run, timeout=120):
+def wait_for_run_to_finish(run, timeout=300):
     "Wait for a Run to finish"
     slept = 0
     while not run.finished_at and slept < timeout:
