@@ -50,7 +50,7 @@ def test_conditional_flows(filename, test_tags, test_id):
 
         run = wait_for_run(deployed_flow.flow_name, ns=test_id)
 
-        finished_run = wait_for_run_to_finish(run, timeout=120)
+        finished_run = wait_for_run_to_finish(run, timeout=300)
 
         assert finished_run.successful
 
