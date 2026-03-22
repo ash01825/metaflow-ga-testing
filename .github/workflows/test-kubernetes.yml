@@ -8,9 +8,9 @@ on:
 
 jobs:
   test-k8s-argo:
-    # Run heavily-resourced K8s tests on main pushes, or if a PR has the 'ok-to-test' label.
     if: github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'ok-to-test')
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Check out QA tests
@@ -43,13 +43,22 @@ jobs:
 
       - name: Run Tox Environments (Kubernetes and Argo)
         working-directory: ./qa-tests
-        # metaflow-dev shell handles setting up the environment variables
-        # (METAFLOW_HOME, AWS_CONFIG_FILE, etc.). Our tox.ini passenv passes them
-        # down to pytest natively. Execute sequentially to avoid CPU starvation.
         run: |
+          # The Host (Pytest) must use localhost, as Metaflow's Tilt stack proxies
+          # these ports seamlessly to the Host machine. 
+          # Note: The Metaflow Kubernetes decorator handles internal routing for the Pod automatically.
           cat <<'EOF' | metaflow-dev shell
-          tox -e kubernetes
-          tox -e argo
+          export METAFLOW_SERVICE_URL=http://localhost:8080
+          
+          # Crucial resource limits to fit Pod inside 2 CPU GH Actions runner
+          export METAFLOW_KUBERNETES_MEMORY=1024
+          export METAFLOW_KUBERNETES_CPU=0.5
+
+          echo "--- Starting Kubernetes Suite ---"
+          tox -e kubernetes -- -v -s
+
+          echo "--- Starting Argo Workflows Suite ---"
+          tox -e argo -- -v -s
           EOF
 
       - name: Teardown Dev Stack
