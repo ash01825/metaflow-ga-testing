@@ -41,7 +41,7 @@ def test_conditional_flows(filename, test_tags, test_id):
     deployed_flow = None
     try:
         deployed_flow = (
-            Deployer(flow_file=os.path.join(ROOT, filename))
+            Deployer(flow_file=os.path.join(ROOT, filename), pylint=False)
             .argo_workflows()
             .create(tags=test_tags)
         )
@@ -77,7 +77,7 @@ def test_failing_conditional_flows(filename, test_tags, test_id):
     try:
         deploy_failed = False
         deployed_flow = (
-            Deployer(flow_file=os.path.join(ROOT, filename))
+            Deployer(flow_file=os.path.join(ROOT, filename), pylint=False)
             .argo_workflows()
             .create(tags=test_tags)
         )

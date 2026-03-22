@@ -32,7 +32,7 @@ def test_successful_trigger_deployments(test_tags):
             buff = io.StringIO()
             with redirect_stdout(buff):
                 deployer = (
-                    Deployer(flow_file=os.path.join(ROOT, filename))
+                    Deployer(flow_file=os.path.join(ROOT, filename), pylint=False)
                     .argo_workflows()
                     .create(tags=test_tags)
                 )
@@ -72,7 +72,7 @@ def test_successful_trigger_on_finish_deployments(test_tags):
             buff = io.StringIO()
             with redirect_stdout(buff):
                 deployer = (
-                    Deployer(flow_file=os.path.join(ROOT, filename))
+                    Deployer(flow_file=os.path.join(ROOT, filename), pylint=False)
                     .argo_workflows()
                     .create(tags=test_tags)
                 )
@@ -100,7 +100,7 @@ def test_expected_failing_trigger_deployments(test_tags):
     for filename in filenames:
         try:
             deployer = (
-                Deployer(flow_file=os.path.join(ROOT, filename))
+                Deployer(flow_file=os.path.join(ROOT, filename), pylint=False)
                 .argo_workflows()
                 .create(tags=test_tags)
             )

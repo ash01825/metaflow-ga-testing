@@ -23,12 +23,12 @@ def test_tags(test_id):
 def test_events(test_tags, test_id):
     try:
         deployed_event_flow = (
-            Deployer(flow_file=os.path.join(ROOTPATH, "eventflow.py"))
+            Deployer(flow_file=os.path.join(ROOTPATH, "eventflow.py"), pylint=False)
             .argo_workflows()
             .create(tags=test_tags)
         )
         deployed_trigger_flow = (
-            Deployer(flow_file=os.path.join(ROOTPATH, "triggering_flow.py"))
+            Deployer(flow_file=os.path.join(ROOTPATH, "triggering_flow.py"), pylint=False)
             .argo_workflows()
             .create(tags=test_tags)
         )
@@ -64,7 +64,7 @@ def test_events(test_tags, test_id):
 def test_cron(test_tags, test_id):
     try:
         deployed_cron_flow = (
-            Deployer(flow_file=os.path.join(ROOTPATH, "cronflow.py"))
+            Deployer(flow_file=os.path.join(ROOTPATH, "cronflow.py"), pylint=False)
             .argo_workflows()
             .create(tags=test_tags)
         )
@@ -83,7 +83,7 @@ def test_cron(test_tags, test_id):
 def test_base_params(test_tags):
     try:
         deployed_flow = (
-            Deployer(flow_file=os.path.join(ROOTPATH, "paramflow.py"))
+            Deployer(flow_file=os.path.join(ROOTPATH, "paramflow.py"), pylint=False)
             .argo_workflows()
             .create(tags=test_tags)
         )

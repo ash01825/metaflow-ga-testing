@@ -13,7 +13,7 @@ def test_tags(test_id):
 @pytest.mark.argo_workflows
 def test_argo_helloflow(test_tags, test_id):
     deployer = Deployer(
-        flow_file=os.path.join(FLOWS_ROOT, "helloflow.py")
+        flow_file=os.path.join(FLOWS_ROOT, "helloflow.py"), pylint=False
     ).argo_workflows()
     deployed_flow = deployer.create(tags=test_tags)
 
@@ -29,7 +29,7 @@ def test_argo_helloflow(test_tags, test_id):
 @pytest.mark.argo_workflows
 def test_argo_conda_flow(test_tags, test_id):
     deployer = Deployer(
-        flow_file=os.path.join(FLOWS_ROOT, "condatest.py"), environment="conda"
+        flow_file=os.path.join(FLOWS_ROOT, "condatest.py"), environment="conda", pylint=False
     ).argo_workflows()
     deployed_flow = deployer.create(tags=test_tags)
 
@@ -45,7 +45,7 @@ def test_argo_conda_flow(test_tags, test_id):
 @pytest.mark.argo_workflows
 def test_argo_pypi_flow(test_tags, test_id):
     deployer = Deployer(
-        flow_file=os.path.join(FLOWS_ROOT, "pypitest.py"), environment="pypi"
+        flow_file=os.path.join(FLOWS_ROOT, "pypitest.py"), environment="pypi", pylint=False
     ).argo_workflows()
     deployed_flow = deployer.create(tags=test_tags)
 
@@ -61,7 +61,7 @@ def test_argo_pypi_flow(test_tags, test_id):
 @pytest.mark.argo_workflows
 def test_argo_notifications(test_tags):
     deployer = Deployer(
-        flow_file=os.path.join(FLOWS_ROOT, "helloflow.py")
+        flow_file=os.path.join(FLOWS_ROOT, "helloflow.py"), pylint=False
     ).argo_workflows(name="argo-notifications-flow")
 
     deployed_flow = None
