@@ -1,0 +1,58 @@
+name: Kubernetes & Argo Tests
+
+on:
+  push:
+    branches: [1b,main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-k8s-argo:
+    # Run heavily-resourced K8s tests on main pushes, or if a PR has the 'ok-to-test' label.
+    if: github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'ok-to-test')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out QA tests
+        uses: actions/checkout@v4
+        with:
+          path: qa-tests
+
+      - name: Check out Metaflow
+        uses: actions/checkout@v4
+        with:
+          repository: Netflix/metaflow
+          path: metaflow-src
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Metaflow Dev Stack & Tox
+        run: |
+          python -m pip install --upgrade pip
+          pip install ./metaflow-src kubernetes tox
+
+      - name: Start Dev Stack
+        working-directory: ./metaflow-src
+        run: |
+          echo "Starting Metaflow dev stack in the background..."
+          MINIKUBE_CPUS=2 metaflow-dev all-up &
+          WAIT_TIMEOUT=600 metaflow-dev wait-until-ready
+
+      - name: Run Tox Environments (Kubernetes and Argo)
+        working-directory: ./qa-tests
+        # metaflow-dev shell handles setting up the environment variables
+        # (METAFLOW_HOME, AWS_CONFIG_FILE, etc.). Our tox.ini passenv passes them
+        # down to pytest natively. Execute sequentially to avoid CPU starvation.
+        run: |
+          cat <<'EOF' | metaflow-dev shell
+          tox -e kubernetes
+          tox -e argo
+          EOF
+
+      - name: Teardown Dev Stack
+        if: always()
+        working-directory: ./metaflow-src
+        run: metaflow-dev down
