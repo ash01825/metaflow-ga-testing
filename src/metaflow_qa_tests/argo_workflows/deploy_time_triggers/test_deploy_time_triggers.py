@@ -1,6 +1,7 @@
 import pytest
 from metaflow import Deployer
 from contextlib import redirect_stdout
+import getpass
 import io
 import os
 
@@ -31,7 +32,7 @@ def test_successful_trigger_deployments(test_tags):
             buff = io.StringIO()
             with redirect_stdout(buff):
                 deployer = (
-                    Deployer(flow_file=os.path.join(ROOT, filename))
+                    Deployer(flow_file=os.path.join(ROOT, filename), pylint=False)
                     .argo_workflows()
                     .create(tags=test_tags)
                 )
@@ -57,7 +58,7 @@ def test_successful_trigger_on_finish_deployments(test_tags):
         ("ParamTestTriggerOnFinish4.py", "DeployTimeTriggerParams"),
         (
             "ParamTestTriggerOnFinish5.py",
-            "deploytime_project_two.user.saikonen.DeployTimeTriggerParams",
+            f"deploytime_project_two.user.{getpass.getuser()}.DeployTimeTriggerParams",
         ),
         (
             "ParamTestTriggerOnFinish6.py",
@@ -71,7 +72,7 @@ def test_successful_trigger_on_finish_deployments(test_tags):
             buff = io.StringIO()
             with redirect_stdout(buff):
                 deployer = (
-                    Deployer(flow_file=os.path.join(ROOT, filename))
+                    Deployer(flow_file=os.path.join(ROOT, filename), pylint=False)
                     .argo_workflows()
                     .create(tags=test_tags)
                 )
@@ -99,7 +100,7 @@ def test_expected_failing_trigger_deployments(test_tags):
     for filename in filenames:
         try:
             deployer = (
-                Deployer(flow_file=os.path.join(ROOT, filename))
+                Deployer(flow_file=os.path.join(ROOT, filename), pylint=False)
                 .argo_workflows()
                 .create(tags=test_tags)
             )

@@ -22,13 +22,13 @@ class HelloFlow(FlowSpec):
 
         self.next(self.b, foreach="var_1")
 
-    @resources(cpu=2, memory=1280)
+    @resources(cpu=0.5, memory=512)
     @step
     def b(self):
         print("In B")
         self.next(self.join)
 
-    @resources(memory=4096)
+    @resources(memory=1024)
     @step
     def join(self, inputs):
         print("YO")
