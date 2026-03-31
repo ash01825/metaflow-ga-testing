@@ -17,3 +17,20 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install tox
       - run: tox -e local
+
+      - name: Generate unified test report
+        if: always()
+        run: |
+          python scripts/merge_results.py \
+            --results-dir test-results \
+            --summary-file "$GITHUB_STEP_SUMMARY" \
+            --html test-results/report.html || true
+
+      - name: Upload HTML test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report-local-py${{ matrix.python-version }}
+          path: test-results/report.html
+          if-no-files-found: warn
+

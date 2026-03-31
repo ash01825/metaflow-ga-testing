@@ -45,11 +45,13 @@ jobs:
         working-directory: ./qa-tests
         run: |
           # The Host (Pytest) must use localhost, as Metaflow's Tilt stack proxies
-          # these ports seamlessly to the Host machine. 
+          # these ports seamlessly to the Host machine.
           # Note: The Metaflow Kubernetes decorator handles internal routing for the Pod automatically.
+          # --junitxml writes to qa-tests/test-results/ which is on the host filesystem,
+          # not inside the container, so results are accessible after the shell exits.
           cat <<'EOF' | metaflow-dev shell
           export METAFLOW_SERVICE_URL=http://localhost:8080
-          
+
           # Crucial resource limits to fit Pod inside 2 CPU GH Actions runner
           export METAFLOW_KUBERNETES_MEMORY=1024
           export METAFLOW_KUBERNETES_CPU=0.5
@@ -65,3 +67,22 @@ jobs:
         if: always()
         working-directory: ./metaflow-src
         run: metaflow-dev down
+
+      - name: Generate unified test report
+        if: always()
+        working-directory: ./qa-tests
+        run: |
+          python scripts/merge_results.py \
+            --results-dir test-results \
+            --summary-file "$GITHUB_STEP_SUMMARY" \
+            --html test-results/report.html || true
+          # '|| true' prevents this step from masking original test failures
+
+      - name: Upload HTML test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report-k8s-argo
+          path: qa-tests/test-results/report.html
+          if-no-files-found: warn
+
